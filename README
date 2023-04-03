@@ -1,0 +1,24 @@
+Welcome to the ENA-submitter app.
+
+The following options are available:
+
+        -u, --user: Webin user name
+        -p --password: Webin password
+        -S --study_id: Webin study ID
+        -n --study_name: Webin study NAME
+        -I --instrument: NGS instrument name, e.g., 'Illumina NovaSeq 6000', 'Illumina iSeq 100'
+        -i, --insert_size: The number of sequenced nucleotide in two reads forming a pair
+        -s, --source:, NGS library source, e.g., 'GENOMIC', 'GENOMIC SINGLE CELL', 'TRANSCRIPTOMIC', 'TRANSCRIPTOMIC SINGLE CELL'
+        -c, --library_selection: Method of the NGS library selection (default: RANDOM)
+        -t, --library_strategy: NGS library type, e.g., 'WGS' (genome), 'WXS' (exome), 'RNA-Seq', 'miRNA-Seq'
+        -f, --fastq_dir: defines the path to the directory containing FASTQ files.
+        -a, --Webin_accessions: defines the path to a tab-delimited txt file with sample accession numbers (samples aliases should be the same as sample prefixes in the corresponding FASTQ files).
+        -T, --threads: number of CPU threads to use (default: 1)
+        -h, --help: prints this help message.
+        -v, --version: prints the version of this program.
+
+INFO: In order to run this program one has to provide a path to the ENA webin-cli app (the bash wrapper script for the webin_cli.jar file).
+
+INFO: This program expects all the fastq.gz reads for a given sample from the same end to be merged into a single fastq.gz file. Thus, all the first reads of the pair should be included in one fastq.gz file, while the second fastq.gz file should contain all the second reads of the pair-end reads. Single-end reads are currently unsupported by this app.
+
+INFO: Sample-determining prefixes in the FASTQ.gz files shoud be placed at the beginning of the file name.
