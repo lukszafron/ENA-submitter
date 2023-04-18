@@ -20,22 +20,23 @@ def usage():
         "\t-p --password: Webin password\n"
         "\t-S --study_id: Webin study ID\n"
         "\t-n --study_name: Webin study NAME\n"
-        "\t-I --instrument: NGS instrument name, e.g., 'Illumina NovaSeq 6000', 'Illumina iSeq 100'\n"
-        "\t-i, --insert_size: The number of sequenced nucleotide in two reads forming a pair\n"
+        "\t-I --instrument: NGS instrument name, e.g., 'Illumina NovaSeq 6000', 'Illumina MiSeq', 'Illumina iSeq 100'\n"
+        "\t-i, --insert_size: The number of sequenced nucleotide in two reads forming a pair (optional)\n"
         "\t-s, --source:, NGS library source, e.g., 'GENOMIC', 'GENOMIC SINGLE CELL', 'TRANSCRIPTOMIC', 'TRANSCRIPTOMIC SINGLE CELL'\n"
         "\t-c, --library_selection: Method of the NGS library selection (default: RANDOM)\n"
-        "\t-t, --library_strategy: NGS library type, e.g., 'WGS' (genome), 'WXS' (exome), 'RNA-Seq', 'miRNA-Seq'\n"
-        "\t-f, --fastq_dir: defines the path to the directory containing FASTQ files.\n"
-        "\t-a, --Webin_accessions: defines the path to a tab-delimited txt file with sample accession numbers (samples aliases should be the same as sample prefixes in the corresponding FASTQ files).\n"
+        "\t-t, --library_strategy: NGS library type, e.g., 'WGS' (genome), 'WXS' (exome), 'RNA-Seq' (transcriptome), 'miRNA-Seq'\n"
+        "\t-f, --reads_dir: defines the path to the directory containing FASTQ/BAM/CRAM files.\n"
+        "\t-r, --reads_type: determines the type of NGS reads. I shoud be: 'FASTQ', 'BAM' or 'CRAM'.\n"
+        "\t-a, --Webin_accessions: defines the path to a tab-delimited txt file with sample accession numbers (samples aliases should be the same as sample prefixes in the corresponding FASTQ/BAM/CRAM files). The aliases must not contain underscore characters '_'.\n"
         "\t-T, --threads: number of CPU threads to use (default: 1)\n"
         "\t-h, --help: prints this help message.\n"
         "\t-v, --version: prints the version of this program.\n"
         )
 # The next two lines are for debugging purposes only and should be commented in the final program.
-# option_list = ["-u", "********", "-p", "********", "-S", "PRJEB61011", "-n", "CRNDE_RNA-seq", "-I", "Illumina NovaSeq 6000", "-i", "200", "-s", "TRANSCRIPTOMIC", "-t", "RNA-Seq","-a", "/workspace/lukasz/NGS-all-in-one/RUNS/CRNDEAB1/FASTQ/Webin-accessions-2023-03-29T12 59 28.917+01 00.txt", "-f", "/workspace/lukasz/NGS-all-in-one/RUNS/CRNDEAB1/FASTQ", "-T", "5"]
-# opts, args = getopt.getopt(option_list, "u:p:S:n:I:i:s:c:t:f:a:T:hv", ["user=","password=","study_id=","study_name=","instrument=","insert_size=","source=","library_selection=","library_strategy=","fastq_dir=","Webin_accessions=","threads=","help","version"])
+# option_list = ["-u", "******", "-p", "******", "-S", "PRJEB61419", "-n", "44genes", "-I", "Illumina MiSeq", "-s", "GENOMIC", "-t", "WXS","-a", "/workspace/lukasz/NGS-all-in-one/RUNS/44GENESVEP100/MAPPINGS_TRIMMED/GRCh38.chr.only.genome/HISAT2/CRNDE-44g_capture_targets_hg38.bed_and_SureSelect_All_Exon_V7_hg38_Padded.bed.subset/Webin-accessions-2023-04-18T09 37 05.538+01 00.txt", "-f", "/workspace/lukasz/NGS-all-in-one/RUNS/44GENESVEP100/MAPPINGS_TRIMMED/GRCh38.chr.only.genome/HISAT2/CRNDE-44g_capture_targets_hg38.bed_and_SureSelect_All_Exon_V7_hg38_Padded.bed.subset/", "-r", "BAM", "-T", "5"]
+# opts, args = getopt.getopt(option_list, "u:p:S:n:I:i:s:c:t:f:r:a:T:hv", ["user=","password=","study_id=","study_name=","instrument=","insert_size=","source=","library_selection=","library_strategy=","reads_dir=", "reads_type=", "Webin_accessions=","threads=","help","version"])
 
-opts, args = getopt.getopt(sys.argv[1:], "u:p:S:n:I:i:s:c:t:f:a:T:hv", ["user=","password=","study_id=","study_name=","instrument=","insert_size=","source=","library_selection=","library_strategy=","fastq_dir=","Webin_accessions=","threads=","help","version"])
+opts, args = getopt.getopt(sys.argv[1:], "u:p:S:n:I:i:s:c:t:f:r:a:T:hv", ["user=","password=","study_id=","study_name=","instrument=","insert_size=","source=","library_selection=","library_strategy=","reads_dir=", "reads_type=", "Webin_accessions=","threads=","help","version"])
 
 try:
         opts,args
@@ -62,8 +63,10 @@ try:
                 lib_selection = a
             elif o in ("-t", "--library_strategy"):
                 lib_strategy = a
-            elif o in ("-f", "--fastq_dir"):
-                fastq_dir = a
+            elif o in ("-f", "--reads_dir"):
+                reads_dir = a
+            elif o in ("-r", "reads_type"):
+                reads_type = a
             elif o in ("-a", "--Webin_accessions"):
                 accessions_path = a
             elif o in ("-T", "--threads"):
@@ -79,7 +82,7 @@ try:
 
 except getopt.GetoptError as err:
     # print help information and exit:
-    print("\n"+str(err),"red") # will print something like "option -a not recognized"
+    print("\n"+str(err)) # will print something like "option -a not recognized"
     usage()
     sys.exit(2)
     
@@ -106,7 +109,7 @@ except:
 try:
     insert_size
 except:
-    raise(Exception("The insert size is missing."))
+    insert_size = None
 try:
     source
 except:
@@ -120,10 +123,13 @@ try:
 except:
     raise(Exception("The library strategy argument is missing."))
 try:
-    fastq_dir
+    reads_dir
 except:
-    raise(Exception("The path to the FASTQ-containing directory is missing."))
-
+    raise(Exception("The path to the FASTQ/BAM/CRAM-containing directory is missing."))
+try:
+    reads_type
+except:
+    raise(Exception("The type of the reads to be submitted to the ENA is missing (possible values are: 'FASTQ', 'BAM', 'CRAM')."))
 try:
     accessions_path
 except:
@@ -145,27 +151,44 @@ class SAMPLE:
     def __init__(self, alias):
         print("Submitting the {} sample, accession_id: {} ({} out of {})...\n".format(alias[1], alias[0], aliases.index((alias[0],alias[1]))+1, len(aliases)), flush = True)
         self.alias = alias
-        self.matching_fastqs = [fastq for fastq in os.listdir(fastq_dir) if re.search(string=fastq, pattern="^"+alias[1].replace(".", "\.")+".*\.fastq\.gz$")]
-    def fastq_exists(self):
-        if(len(self.matching_fastqs) != 2):
-            raise Exception("There is an incorrect number of merged FASTQ files ({1}) for the sample: {0}.\n".format(self.alias[1], len(self.matching_fastqs)))
-    def run_tests(self):
-        # print("Testing if exactly two merged FASTQ files exist for the analyzed sample...\n", flush=True)
-        self.fastq_exists()
+        if reads_type == "FASTQ":
+            self.matching_reads = [reads for reads in os.listdir(reads_dir) if re.search(string=reads, pattern="^"+str(alias[1]).replace(".", "\.")+"_.*\.fastq\.gz$")]
+            if(len(self.matching_reads) != 2):
+                raise Exception("There is an incorrect number of merged {0} files ({1}) for the sample: {2}. All R1 reads should be provided in one merged fastq file, and all R2 reads in another merged fastq file.\n".format("FASTQ", len(self.matching_reads), self.alias[1]))
+        elif reads_type == "BAM":
+            self.matching_reads = [reads for reads in os.listdir(reads_dir) if re.search(string=reads, pattern="^"+str(alias[1]).replace(".", "\.")+"_.*\.bam$")]
+            if(len(self.matching_reads) != 1):
+                raise Exception("There is an incorrect number of {0} files ({1}) for the sample: {2}.\n".format("BAM", len(self.matching_reads), self.alias[1]))
+        elif reads_type == "CRAM":
+            self.matching_reads = [reads for reads in os.listdir(reads_dir) if re.search(string=reads, pattern="^"+str(alias[1]).replace(".", "\.")+"_.*\.cram$")]
+            if(len(self.matching_reads) != 1):
+                raise Exception("There is an incorrect number of {0} files ({1}) for the sample: {2}.\n".format("CRAM", len(self.matching_reads), self.alias[1]))
     def manifest(self):
         # print("Generating the MANIFEST file...\n", flush=True)
-        self.manifest_dict = {"SAMPLE":self.alias[0], "STUDY":study_id, "NAME":'_'.join([study_name, self.alias[1]]), "INSTRUMENT":instrument, "INSERT_SIZE":insert_size, "LIBRARY_SOURCE":source, "LIBRARY_SELECTION":lib_selection, "LIBRARY_STRATEGY":lib_strategy}
+        self.manifest_dict = {
+            "SAMPLE":self.alias[0], 
+            "STUDY":study_id, 
+            "NAME":'_'.join([study_name, str(self.alias[1])]), 
+            "INSTRUMENT":instrument, 
+            "INSERT_SIZE":str(insert_size), 
+            "LIBRARY_SOURCE":source, 
+            "LIBRARY_SELECTION":lib_selection, 
+            "LIBRARY_STRATEGY":lib_strategy,
+            "SUBMISSION_TOOL":appname,
+            "SUBMISSION_TOOL_VERSION":app_version
+            }
+        self.manifest_dict = {k:v for k,v in self.manifest_dict.items() if v != "None"}
         self.items = [v for v in self.manifest_dict.items()]
         self.tsv = []
         for i,v in enumerate(self.items):
             self.tsv.append('\t'.join(self.items[i]))
-        self.tsv = self.tsv + ['\t'.join(["FASTQ", fastq]) for fastq in self.matching_fastqs]
-        self.file_alias = os.path.join(fastq_dir, self.alias[1]+"_Manifest.txt")
+        self.tsv = self.tsv + ['\t'.join([reads_type, reads]) for reads in self.matching_reads]
+        self.file_alias = os.path.join(reads_dir, str(self.alias[1])+"_Manifest.txt")
         with open(file = self.file_alias, mode = "wt") as out:
             out.write('\n'.join(self.tsv))
     def submission(self):
-#        print("Submitting the FASTQ files and metadata to the European Nucleotide Archive (ENA) database...\n", flush=True)
-        self.res = subprocess.run([webin_cli_path, "-context reads", "-inputDir", fastq_dir, "-outputDir", fastq_dir, "-manifest", self.file_alias, "-userName", user, "-password", password, "-submit"], text = True)
+#        print("Submitting the FASTQ/BAM/CRAM files and metadata to the European Nucleotide Archive (ENA) database...\n", flush=True)
+        self.res = subprocess.run([webin_cli_path, "-context reads", "-inputDir", reads_dir, "-outputDir", reads_dir, "-manifest", self.file_alias, "-userName", user, "-password", password, "-submit"], text = True)
         if self.res.returncode == 0:
             print("{} sample submission is done.\n".format(self.alias[1]), flush=True)
         else:
@@ -173,7 +196,6 @@ class SAMPLE:
 
 def exec_func(alias):
     sample = SAMPLE(alias)
-    sample.run_tests()
     sample.manifest()
     sample.submission()
     return sample.res.returncode
@@ -187,5 +209,7 @@ if len([v for v in returncodes if v == 0]) == len(aliases):
     print("All samples have been submitted to the ENA successfully.\n")
 else:
     print("WARNING: Some errors occurred during the submission process.\n")
+    erroneous_submissions = [aliases[i][1] for i,v in enumerate(returncodes) if v != 0]
+    print("The following sample(s): {} has/have not been submitted to the ENA because of errors.".format(', '.join(erroneous_submissions)))
 
 print("--- The sample submission process took %s hh:mm:ss. ---\n" % str(datetime.timedelta(seconds = round(time.time() - start_time, 0))))
