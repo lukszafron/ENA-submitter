@@ -10,7 +10,7 @@ The following options are available:
 	-i, --insert_size: The number of sequenced nucleotide in two reads forming a pair (optional)
 	-s, --source:, NGS library source, e.g., 'GENOMIC', 'GENOMIC SINGLE CELL', 'TRANSCRIPTOMIC', 'TRANSCRIPTOMIC SINGLE CELL'
 	-c, --library_selection: Method of the NGS library selection (default: RANDOM)
-	-t, --library_strategy: NGS library type, e.g., 'WGS' (genome), 'WXS' (exome), 'RNA-Seq' (transcriptome), 'miRNA-Seq'
+	-t, --library_strategy: NGS library type, e.g., 'WGS' (genome), 'WXS' (exome), 'RNA-Seq' (transcriptome), 'Targeted-Capture','miRNA-Seq'
 	-f, --reads_dir: defines the path to the directory containing FASTQ/BAM/CRAM files.
 	-r, --reads_type: determines the type of NGS reads. It should be: 'FASTQ', 'BAM' or 'CRAM'.
 	-a, --Webin_accessions: defines the path to a tab-delimited txt file with sample accession numbers (samples aliases should be the same as sample prefixes in the corresponding FASTQ/BAM/CRAM file names). The sample aliases/prefixes must not contain underscore characters '_'.
