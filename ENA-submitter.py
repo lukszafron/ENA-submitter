@@ -210,6 +210,6 @@ if len([v for v in returncodes if v == 0]) == len(aliases):
 else:
     print("WARNING: Some errors occurred during the submission process.\n")
     erroneous_submissions = [aliases[i][1] for i,v in enumerate(returncodes) if v != 0]
-    print("{} sample(s): {} has/have not been submitted to the ENA because of errors.".format(len(erroneous_submissions), ', '.join(erroneous_submissions)))
+    print("{} sample(s): {} has/have not been submitted to the ENA because of errors.\n".format(len(erroneous_submissions), ', '.join(erroneous_submissions)))
 
 print("--- The sample submission process took %s hh:mm:ss. ---\n" % str(datetime.timedelta(seconds = round(time.time() - start_time, 0))))
