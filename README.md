@@ -1,8 +1,8 @@
 # $${\color{lightgreen}ENA-submitter}$$
 
-Welcome to the ENA-submitter app.
+Welcome to the ENA-submitter,
 
-A Python app allowing for a concurrent submission of many paired-end FASTQ reads or BAM/CRAM alignments to the European Nucleotide Archive Database (ENA); requires the webin-cli.jar app to be installed. 
+a Python app allowing for the concurrent submission of many paired-end FASTQ reads or BAM/CRAM alignments to the European Nucleotide Archive Database (ENA); this software requires the webin-cli.jar app to be installed. 
 
 The following options are available:
 
