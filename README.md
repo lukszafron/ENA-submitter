@@ -1,4 +1,4 @@
-# $${\color{lightgreen}ENA-submitter}$$
+# $${\color{green}ENA-submitter}$$
 
 Welcome to the ENA-submitter,
 
